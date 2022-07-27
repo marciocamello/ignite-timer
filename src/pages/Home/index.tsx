@@ -13,11 +13,6 @@ import {
   TaskInput,
 } from './styles'
 
-interface FormData {
-  task: string
-  minutesAmount: number
-}
-
 const newTaskFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Task must have at least 1 character'),
   minutesAmount: zod
@@ -26,18 +21,20 @@ const newTaskFormValidationSchema = zod.object({
     .max(60, 'Minutes amount must be at most 60'),
 })
 
+type NewTaskData = zod.infer<typeof newTaskFormValidationSchema>
+
 export function Home() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, watch, reset } = useForm<NewTaskData>({
     resolver: zodResolver(newTaskFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
   })
 
-  function handleCreateNewTask(data: any) {
+  function handleCreateNewTask(data: NewTaskData) {
     console.log(data)
+    reset()
   }
 
   const task = watch('task')
